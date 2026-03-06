@@ -1,0 +1,84 @@
+@model SurveyApp.Models.Question
+@{
+    ViewData["Title"] = "Sửa câu hỏi";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h4 class="fw-bold mb-4"><i class="bi bi-pencil text-warning me-2"></i>Sửa câu hỏi</h4>
+
+                <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    <div class="mb-3">
+                        <label asp-for="Text" class="form-label fw-semibold"></label>
+                        <input asp-for="Text" class="form-control" />
+                        <span asp-validation-for="Text" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="QuestionType" class="form-label fw-semibold"></label>
+                        <select asp-for="QuestionType" class="form-select" id="questionTypeSelect"
+                                asp-items="Html.GetEnumSelectList<SurveyApp.Models.QuestionType>()"></select>
+                    </div>
+
+                    <div id="optionsSection" class="mb-4">
+                        <label class="form-label fw-semibold">Các lựa chọn</label>
+                        <div id="optionsList">
+                            @if (Model.Options != null)
+                            {
+                                @foreach (var opt in Model.Options)
+                                {
+                                    <div class="input-group mb-2">
+                                        <input type="text" name="optionTexts" class="form-control" value="@opt.Text" />
+                                        <button type="button" class="btn btn-outline-danger" onclick="removeOption(this)">
+                                            <i class="bi bi-x"></i>
+                                        </button>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addOption()">
+                            <i class="bi bi-plus me-1"></i>Thêm lựa chọn
+                        </button>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning fw-semibold">
+                            <i class="bi bi-check-circle me-1"></i>Lưu thay đổi
+                        </button>
+                        <a asp-controller="Survey" asp-action="Details" asp-route-id="@Model.SurveyId"
+                           class="btn btn-secondary">Hủy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const typeSelect = document.getElementById('questionTypeSelect');
+    const optionsSection = document.getElementById('optionsSection');
+
+    function toggleOptions() {
+        optionsSection.style.display = typeSelect.value === '0' ? 'block' : 'none';
+    }
+    typeSelect.addEventListener('change', toggleOptions);
+    toggleOptions();
+
+    let optionCount = @(Model.Options?.Count ?? 0);
+    function addOption() {
+        optionCount++;
+        const div = document.createElement('div');
+        div.className = 'input-group mb-2';
+        div.innerHTML = `<input type="text" name="optionTexts" class="form-control" placeholder="Lựa chọn ${optionCount}" />
+            <button type="button" class="btn btn-outline-danger" onclick="removeOption(this)"><i class="bi bi-x"></i></button>`;
+        document.getElementById('optionsList').appendChild(div);
+    }
+
+    function removeOption(btn) {
+        btn.closest('.input-group').remove();
+    }
+</script>
+}

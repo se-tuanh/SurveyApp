@@ -1,0 +1,77 @@
+@model IEnumerable<SurveyApp.ViewModels.UserManagementViewModel>
+@{
+    ViewData["Title"] = "Quản lý người dùng";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0"><i class="bi bi-people text-primary me-2"></i>Quản lý người dùng</h2>
+    <a asp-action="Dashboard" class="btn btn-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>Quay lại Dashboard
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Người dùng</th>
+                        <th>Ngày tham gia</th>
+                        <th class="text-center">Khảo sát</th>
+                        <th class="text-center">Trả lời</th>
+                        <th>Vai trò</th>
+                        <th class="text-end">Phân quyền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">@user.FullName</div>
+                                <div class="text-muted small">@user.Email</div>
+                            </td>
+                            <td class="text-muted small">@user.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                            <td class="text-center"><span class="badge bg-info text-dark">@user.SurveyCount</span></td>
+                            <td class="text-center"><span class="badge bg-secondary">@user.ResponseCount</span></td>
+                            <td>
+                                @foreach (var role in user.Roles)
+                                {
+                                    <span class="badge bg-@(role == "Admin" ? "danger" : "primary") me-1">@role</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <form asp-action="ToggleRole" method="post">
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <input type="hidden" name="role" value="Admin" />
+                                        @if (user.Roles.Contains("Admin"))
+                                        {
+                                            <button type="submit" class="btn btn-outline-warning btn-sm" title="Hủy quyền Admin">
+                                                <i class="bi bi-person-dash"></i> Bỏ Admin
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button type="submit" class="btn btn-outline-success btn-sm" title="Cấp quyền Admin">
+                                                <i class="bi bi-person-check"></i> Cấp Admin
+                                            </button>
+                                        }
+                                    </form>
+                                    
+                                    <form asp-action="DeleteUser" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa người dùng này?');">
+                                        <input type="hidden" name="userId" value="@user.Id" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" title="Xóa người dùng">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
