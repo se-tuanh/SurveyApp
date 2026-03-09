@@ -1,7 +1,5 @@
 # Hệ thống quản lý Khảo sát trực tuyến (Survey Management App)
 
-Đây là một dự án ứng dụng web dùng để quản lý khảo sát trực tuyến, được phát triển bằng **C#** và **ASP.NET Core MVC**. Dự án này là bài tập môn học (PRN222).
-
 ## 🚀 Công nghệ sử dụng
 - **Ngôn ngữ:** C# 12
 - **Framework:** ASP.NET Core 8 MVC
@@ -54,10 +52,8 @@
 ### 🔑 Tài khoản khởi tạo mặc định (Seeding Data)
 Khi ứng dụng khởi chạy lần đầu tiên và được tạo Database, hệ thống sẽ tự động tạo Roles `Admin`, `User` cùng 1 tài khoản Admin mặc định để bạn đăng nhập:
 
-- **Email:** `admin@survey.com`
-- **Password:** `Admin@123`
-
-*(Bạn nên thay đổi mật khẩu sau khi đăng nhập thành công hoặc tạo tài khoản mới rồi cấp quyền Admin ở phần Quản lý người dùng).*
+- **Email:** 
+- **Password:**
 
 ## 📁 Cấu trúc thư mục 
 - `Controllers/`: Mọi Controller xử lý logic điều hướng (Home, Account, Survey, Admin, Response, Statistics...).
@@ -66,5 +62,3 @@ Khi ứng dụng khởi chạy lần đầu tiên và được tạo Database, h
 - `Views/`: Mã nguồn giao diện (.cshtml).
 - `Data/`: Chứa file cấu hình EntityFramework (`ApplicationDbContext`) và logic Seed dữ liệu mặc định (`SeedData.cs`).
 
----
-*Developed as a class project for PRN222.*
