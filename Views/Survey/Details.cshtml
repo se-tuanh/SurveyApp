@@ -1,0 +1,95 @@
+@model SurveyApp.Models.Survey
+@{
+    ViewData["Title"] = "Chi tiết khảo sát";
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h2 class="fw-bold mb-1">
+            @Model.Title
+            @if (Model.ClosedAt.HasValue && Model.ClosedAt.Value <= DateTime.Now)
+            {
+                <span class="badge bg-danger ms-2 fs-6 align-middle">Đã đóng</span>
+            }
+        </h2>
+        <p class="text-muted mb-2">@(Model.Description ?? "Không có mô tả")</p>
+        <div class="d-flex gap-3 text-muted small">
+            <span><i class="bi bi-person me-1"></i>@(Model.CreatedBy?.FullName ?? Model.CreatedBy?.Email)</span>
+            <span><i class="bi bi-calendar me-1"></i>Tạo: @Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</span>
+            @if (Model.ClosedAt.HasValue)
+            {
+                <span class="@(Model.ClosedAt.Value <= DateTime.Now ? "text-danger" : "text-warning") fw-bold">
+                    <i class="bi bi-clock-history me-1"></i>Đóng: @Model.ClosedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                </span>
+            }
+        </div>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning btn-sm">
+            <i class="bi bi-pencil me-1"></i>Sửa
+        </a>
+        <a asp-controller="Statistics" asp-action="Index" asp-route-surveyId="@Model.Id" class="btn btn-success btn-sm">
+            <i class="bi bi-bar-chart me-1"></i>Thống kê
+        </a>
+        <a asp-action="Index" class="btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Quay lại
+        </a>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="fw-bold mb-0"><i class="bi bi-question-circle text-primary me-2"></i>Danh sách câu hỏi</h5>
+    <a asp-controller="Question" asp-action="Create" asp-route-surveyId="@Model.Id" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-circle me-1"></i>Thêm câu hỏi
+    </a>
+</div>
+
+@if (!Model.Questions.Any())
+{
+    <div class="text-center py-4 bg-light rounded">
+        <i class="bi bi-question-square display-4 text-muted"></i>
+        <p class="mt-2 text-muted">Chưa có câu hỏi nào. Thêm câu hỏi để bắt đầu.</p>
+    </div>
+}
+else
+{
+    @for (int i = 0; i < Model.Questions.Count; i++)
+    {
+        var question = Model.Questions.ElementAt(i);
+        <div class="card mb-3 border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h6 class="fw-bold mb-1">
+                            Câu @(i + 1): @question.Text
+                            <span class="badge @(question.QuestionType == SurveyApp.Models.QuestionType.MultipleChoice ? "bg-primary" : "bg-secondary") ms-2 small">
+                                @(question.QuestionType == SurveyApp.Models.QuestionType.MultipleChoice ? "Trắc nghiệm" : "Tự luận")
+                            </span>
+                        </h6>
+                        @if (question.QuestionType == SurveyApp.Models.QuestionType.MultipleChoice && question.Options.Any())
+                        {
+                            <ul class="list-unstyled mb-0 mt-2">
+                                @foreach (var opt in question.Options)
+                                {
+                                    <li class="text-muted small"><i class="bi bi-circle me-2"></i>@opt.Text</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                    <div class="d-flex gap-1 ms-3">
+                        <a asp-controller="Question" asp-action="Edit" asp-route-id="@question.Id"
+                           class="btn btn-outline-warning btn-sm" title="Sửa">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form asp-controller="Question" asp-action="Delete" asp-route-id="@question.Id" method="post"
+                              onsubmit="return confirm('Xóa câu hỏi này?')">
+                            <button class="btn btn-outline-danger btn-sm" title="Xóa">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

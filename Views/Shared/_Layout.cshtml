@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SurveyApp</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .navbar {
+            background-color: #ffffff !important;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .navbar-brand {
+            color: #db2777 !important;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+        .nav-link {
+            color: #555 !important;
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            color: #db2777 !important;
+        }
+        .btn-primary {
+            background-color: #f472b6 !important;
+            border-color: #f472b6 !important;
+        }
+        .btn-primary:hover {
+            background-color: #db2777 !important;
+            border-color: #db2777 !important;
+        }
+        .btn-outline-primary {
+            color: #f472b6 !important;
+            border-color: #f472b6 !important;
+        }
+        .btn-outline-primary:hover {
+            background-color: #f472b6 !important;
+            color: white !important;
+            border-color: #f472b6 !important;
+        }
+        .text-primary {
+            color: #db2777 !important;
+        }
+        .dropdown-menu {
+            border: 1px solid #dee2e6;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        .alert {
+            border: 1px solid transparent;
+        }
+        footer {
+            background-color: #ffffff !important;
+            color: #6c757d;
+        }
+        main.container {
+            min-height: calc(100vh - 160px);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top py-2">
+        <div class="container">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                SurveyApp
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto ps-3">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">
+                            Trang chủ
+                        </a>
+                    </li>
+                    @if (User.Identity!.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Survey" asp-action="Index">
+                                Khảo sát của tôi
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Response" asp-action="History">
+                                Đã tham gia
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Survey" asp-action="Create">
+                                Tạo khảo sát
+                            </a>
+                        </li>
+                    }
+                </ul>
+                <ul class="navbar-nav ms-auto align-items-center">
+                    @if (User.Identity!.IsAuthenticated)
+                    {
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item me-2 pe-2 border-end d-none d-lg-block">
+                                <span class="nav-link text-muted pb-0 mb-0" style="font-size: 0.75rem;">Admin</span>
+                                <div class="d-flex">
+                                    <a class="nav-link text-primary fw-semibold py-0 ps-0 pe-2 border-end" asp-controller="Admin" asp-action="Dashboard">
+                                        Dashboard
+                                    </a>
+                                    <a class="nav-link text-info fw-semibold py-0 ps-2" asp-controller="Admin" asp-action="AllSurveys">
+                                        Khảo sát
+                                    </a>
+                                </div>
+                            </li>
+                        }
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                @User.Identity.Name
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end p-2">
+                                <li>
+                                    <form asp-controller="Account" asp-action="Logout" method="post">
+                                        <button class="dropdown-item text-danger" type="submit">
+                                            Đăng xuất
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                Đăng nhập
+                            </a>
+                        </li>
+                        <li class="nav-item ms-lg-2">
+                            <a class="btn btn-primary px-3" asp-controller="Account" asp-action="Register">
+                                Đăng ký
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container my-5">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Warning"] != null)
+        {
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                @TempData["Warning"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @RenderBody()
+    </main>
+
+    <footer class="border-top py-4 mt-auto">
+        <div class="container text-center text-muted small">
+            <p class="mb-0 fw-medium">&copy; 2024 SurveyApp</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

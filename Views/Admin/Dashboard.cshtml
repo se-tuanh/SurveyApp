@@ -1,0 +1,144 @@
+@model SurveyApp.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard Admin";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold mb-0">Dashboard</h2>
+    <div class="d-flex gap-2">
+        <a asp-action="AllSurveys" class="btn btn-outline-info btn-sm">
+            <i class="bi bi-collection me-1"></i>Tất cả khảo sát
+        </a>
+        <a asp-action="Users" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-people me-1"></i>Quản lý người dùng
+        </a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Tổng khảo sát</div>
+                <div class="fs-2 fw-bold text-primary">@Model.TotalSurveys</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Đang hoạt động</div>
+                <div class="fs-2 fw-bold text-success">@Model.ActiveSurveys</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Lượt trả lời</div>
+                <div class="fs-2 fw-bold text-warning">@Model.TotalResponses</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-muted small">Người dùng</div>
+                <div class="fs-2 fw-bold text-info">@Model.TotalUsers</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header fw-bold">
+                Top khảo sát theo lượt trả lời
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.TopSurveys.Any())
+                {
+                    <p class="text-muted text-center py-4">Chưa có dữ liệu</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tiêu đề</th>
+                                    <th class="text-center">Câu hỏi</th>
+                                    <th class="text-center">Trả lời</th>
+                                    <th class="text-center">Trạng thái</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var s in Model.TopSurveys)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">@s.Title</td>
+                                        <td class="text-center"><span class="badge bg-info">@s.QuestionCount</span></td>
+                                        <td class="text-center"><span class="badge bg-primary">@s.ResponseCount</span></td>
+                                        <td class="text-center">
+                                            <span class="badge @(s.IsActive ? "bg-success" : "bg-secondary")">
+                                                @(s.IsActive ? "Mở" : "Đóng")
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-1">
+                                                <a asp-controller="Statistics" asp-action="Index" asp-route-surveyId="@s.SurveyId"
+                                                   class="btn btn-outline-success btn-sm">
+                                                    Thống kê
+                                                </a>
+                                                <a asp-action="ExportExcel" asp-route-surveyId="@s.SurveyId"
+                                                   class="btn btn-outline-success btn-sm">
+                                                    Excel
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header fw-bold">
+                Hoạt động gần đây
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.RecentResponses.Any())
+                {
+                    <p class="text-muted text-center py-4">Chưa có hoạt động</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var r in Model.RecentResponses)
+                        {
+                            <li class="list-group-item px-3 py-2">
+                                <div class="d-flex align-items-start gap-2">
+                                    <div>
+                                        <div class="small fw-semibold">@r.UserName</div>
+                                        <div class="text-muted small">đã trả lời <em>@r.SurveyTitle</em></div>
+                                        <div class="text-muted" style="font-size:0.75rem">
+                                            @r.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,59 @@
+@model SurveyApp.Models.Survey
+@{
+    ViewData["Title"] = "Trả lời khảo sát";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-4">
+                <h3 class="fw-bold mb-1">@Model.Title</h3>
+                <p class="text-muted">@(Model.Description ?? "")</p>
+            </div>
+        </div>
+
+        <form asp-controller="Response" asp-action="Submit" method="post">
+            <input type="hidden" name="surveyId" value="@Model.Id" />
+
+            @for (int i = 0; i < Model.Questions.Count; i++)
+            {
+                var question = Model.Questions.ElementAt(i);
+                <div class="card mb-3 shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3">
+                            <span class="badge bg-primary me-2">@(i + 1)</span>@question.Text
+                        </h6>
+
+                        @if (question.QuestionType == SurveyApp.Models.QuestionType.MultipleChoice)
+                        {
+                            @foreach (var option in question.Options)
+                            {
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="radio"
+                                           name="question_@question.Id"
+                                           id="opt_@option.Id"
+                                           value="@option.Id" />
+                                    <label class="form-check-label" for="opt_@option.Id">@option.Text</label>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <textarea name="question_@question.Id" class="form-control"
+                                      rows="3" placeholder="Nhập câu trả lời của bạn..."></textarea>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Hủy
+                </a>
+                <button type="submit" class="btn btn-primary fw-semibold px-4">
+                    <i class="bi bi-send me-1"></i>Nộp khảo sát
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

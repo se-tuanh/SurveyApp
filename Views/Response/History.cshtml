@@ -1,0 +1,90 @@
+@model IEnumerable<SurveyApp.ViewModels.HistoryViewModel>
+@{
+    ViewData["Title"] = "Lịch sử tham gia";
+}
+
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold">
+            <i class="bi bi-clock-history text-primary me-2"></i>Các khảo sát đã làm
+        </h2>
+        <p class="text-muted mb-0">Danh sách các khảo sát bạn đã gửi câu trả lời.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-funnel me-1"></i> 
+                @(ViewBag.CurrentFilter == "open" ? "Đang mở" : ViewBag.CurrentFilter == "closed" ? "Đã đóng" : "Tất cả")
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="filterDropdown">
+                <li><a class="dropdown-item @(ViewBag.CurrentFilter == "all" || string.IsNullOrEmpty(ViewBag.CurrentFilter) ? "active" : "")" asp-action="History" asp-route-filter="all">Tất cả</a></li>
+                <li><a class="dropdown-item @(ViewBag.CurrentFilter == "open" ? "active" : "")" asp-action="History" asp-route-filter="open">Đang mở</a></li>
+                <li><a class="dropdown-item @(ViewBag.CurrentFilter == "closed" ? "active" : "")" asp-action="History" asp-route-filter="closed">Đã đóng</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Khảo sát</th>
+                        <th>Người tạo</th>
+                        <th>Thời gian nộp</th>
+                        <th>Trạng thái</th>
+                        <th class="text-end pe-4">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                Bạn chưa tham gia khảo sát nào.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            bool isClosed = !item.IsActive || (item.ClosedAt.HasValue && item.ClosedAt.Value <= DateTime.Now);
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-semibold text-truncate" style="max-width: 250px;" title="@item.SurveyTitle">
+                                        @item.SurveyTitle
+                                    </div>
+                                    <div class="small text-muted">@item.TotalQuestions câu hỏi</div>
+                                </td>
+                                <td>@item.CreatorName</td>
+                                <td class="text-muted small">
+                                    <i class="bi bi-check-circle text-success me-1"></i>
+                                    @item.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                </td>
+                                <td>
+                                    @if (isClosed)
+                                    {
+                                        <span class="badge bg-danger">Đã đóng</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">Đang mở</span>
+                                    }
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a asp-action="Details" asp-route-id="@item.ResponseId" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye me-1"></i>Xem lại
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

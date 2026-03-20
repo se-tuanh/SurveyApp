@@ -1,0 +1,102 @@
+@model SurveyApp.ViewModels.ResponseDetailViewModel
+@{
+    ViewData["Title"] = "Chi tiết câu trả lời";
+}
+
+<div class="row align-items-center mb-4">
+    <div class="col-md-8">
+        <h2 class="fw-bold">@Model.Survey.Title</h2>
+        <p class="text-muted mb-0">@Model.Survey.Description</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <span class="badge bg-success fs-6">
+            <i class="bi bi-check-circle me-1"></i>Đã nộp: @Model.SubmittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+        </span>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold d-flex align-items-center">
+            <i class="bi bi-file-text text-primary me-2"></i>Chi tiết bài làm
+        </h5>
+        <div>
+            @if (Model.Survey.Questions.Any(q => q.Options.Any(o => o.IsCorrect)))
+            {
+                <span class="badge bg-light text-success border border-success me-2 pb-1" title="Khảo sát này có đáp án gợi ý">
+                    <i class="bi bi-check2-circle me-1"></i>Có đáp án gợi ý
+                </span>
+            }
+        </div>
+    </div>
+
+    <div class="card-body p-4">
+        @foreach (var question in Model.Survey.Questions.OrderBy(q => q.Order))
+        {
+            var answer = Model.UserAnswers.FirstOrDefault(a => a.QuestionId == question.Id);
+
+            <div class="mb-5 last-mb-0">
+                <h5 class="mb-3 d-flex align-items-start gap-2">
+                    <span class="badge bg-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 28px; height: 28px;">
+                        @(question.Order + 1)
+                    </span>
+                    <span class="fw-semibold">@question.Text</span>
+                </h5>
+
+                <div class="ms-4 ps-2 border-start border-2 border-primary border-opacity-25 py-2">
+                    @if (question.QuestionType == QuestionType.Text)
+                    {
+                        <div class="bg-light p-3 rounded text-dark">
+                            @(string.IsNullOrWhiteSpace(answer?.TextAnswer) ?Html.Raw("<span class='text-muted fst-italic'>Không có câu trả lời</span>") : answer.TextAnswer)
+                        </div>
+                    }
+                    else if (question.QuestionType == QuestionType.MultipleChoice)
+                    {
+                        <div class="d-flex flex-column gap-2 mt-2">
+                            @foreach (var option in question.Options)
+                            {
+                                bool isSelected = answer?.SelectedOptionId == option.Id;
+                                bool isCorrect = option.IsCorrect;
+
+                                string bgClass = isSelected ? "bg-primary bg-opacity-10 border-primary" : "bg-light border-light";
+                                string textClass = isSelected ? "text-primary fw-semibold" : "text-dark";
+                                string icon = isSelected ? "bi-check-circle-fill" : "bi-circle";
+                                string iconColor = isSelected ? "text-primary" : "text-muted";
+
+                                if (isCorrect)
+                                {
+                                    bgClass += " border-success border-end-0 border-top-0 border-bottom-0 border-start border-4";
+                                }
+
+                                <div class="px-3 py-2 rounded border d-flex align-items-center justify-content-between @bgClass @textClass">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi @icon @iconColor fs-5"></i>
+                                        <span>@option.Text</span>
+                                    </div>
+                                    @if (isCorrect)
+                                    {
+                                        <span class="badge bg-success" title="Đáp án đúng/gợi ý">
+                                            <i class="bi bi-check-lg"></i>
+                                        </span>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="text-center">
+    <a asp-action="History" class="btn btn-secondary px-4">
+        <i class="bi bi-arrow-left me-1"></i>Quay lại lịch sử
+    </a>
+</div>
+
+<style>
+    .last-mb-0:last-child {
+        margin-bottom: 0 !important;
+    }
+</style>
