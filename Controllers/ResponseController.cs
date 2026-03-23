@@ -23,7 +23,7 @@ namespace SurveyApp.Controllers
         {
             var survey = await _context.Surveys
                 .Include(s => s.Questions).ThenInclude(q => q.Options)
-                .FirstOrDefaultAsync(s => s.Id == surveyId && s.IsActive);
+                .FirstOrDefaultAsync(s => s.Id == surveyId);
 
             if (survey == null) return NotFound();
 
@@ -37,9 +37,9 @@ namespace SurveyApp.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            if (survey.ClosedAt.HasValue && survey.ClosedAt.Value <= DateTime.Now)
+            if (!survey.IsActive || (survey.ClosedAt.HasValue && survey.ClosedAt.Value <= DateTime.Now))
             {
-                TempData["Warning"] = $"Khảo sát này đã đóng lúc {survey.ClosedAt.Value:dd/MM/yyyy HH:mm}.";
+                TempData["Warning"] = survey.ClosedAt.HasValue ? $"Khảo sát này đã đóng lúc {survey.ClosedAt.Value:dd/MM/yyyy HH:mm}." : "Khảo sát này đã đóng.";
                 return RedirectToAction("Index", "Home");
             }
 
@@ -52,7 +52,7 @@ namespace SurveyApp.Controllers
         {
             var survey = await _context.Surveys
                 .Include(s => s.Questions).ThenInclude(q => q.Options)
-                .FirstOrDefaultAsync(s => s.Id == surveyId && s.IsActive);
+                .FirstOrDefaultAsync(s => s.Id == surveyId);
 
             if (survey == null) return NotFound();
 
@@ -66,9 +66,9 @@ namespace SurveyApp.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            if (survey.ClosedAt.HasValue && survey.ClosedAt.Value <= DateTime.Now)
+            if (!survey.IsActive || (survey.ClosedAt.HasValue && survey.ClosedAt.Value <= DateTime.Now))
             {
-                TempData["Warning"] = $"Khảo sát này đã đóng lúc {survey.ClosedAt.Value:dd/MM/yyyy HH:mm}. Cập nhật không được chấp nhận.";
+                TempData["Warning"] = survey.ClosedAt.HasValue ? $"Khảo sát này đã đóng lúc {survey.ClosedAt.Value:dd/MM/yyyy HH:mm}. Cập nhật không được chấp nhận." : "Khảo sát này đã đóng. Cập nhật không được chấp nhận.";
                 return RedirectToAction("Index", "Home");
             }
 

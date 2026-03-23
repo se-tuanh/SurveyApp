@@ -45,7 +45,7 @@ else
                     <div class="card-body">
                         <h5 class="card-title fw-bold">
                             @survey.Title
-                            @if (survey.ClosedAt.HasValue && survey.ClosedAt.Value <= DateTime.Now)
+                            @if (!survey.IsActive || (survey.ClosedAt.HasValue && survey.ClosedAt.Value <= DateTime.Now))
                             {
                                 <span class="badge bg-danger ms-2 fs-6">Đã đóng</span>
                             }
@@ -66,7 +66,7 @@ else
                     <div class="card-footer bg-transparent pb-3">
                         @if (User.Identity!.IsAuthenticated)
                         {
-                            bool isClosed = survey.ClosedAt.HasValue && survey.ClosedAt.Value <= DateTime.Now;
+                            bool isClosed = !survey.IsActive || (survey.ClosedAt.HasValue && survey.ClosedAt.Value <= DateTime.Now);
                             <a asp-controller="Response" asp-action="Take" asp-route-surveyId="@survey.Id"
                                class="btn @(isClosed ? "btn-secondary disabled" : "btn-primary") btn-sm w-100">
                                 @(isClosed ? "Khảo sát đã đóng" : "Tham gia khảo sát")
